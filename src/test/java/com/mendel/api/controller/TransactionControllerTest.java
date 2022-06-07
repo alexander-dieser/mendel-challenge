@@ -1,5 +1,6 @@
 package com.mendel.api.controller;
 
+import com.mendel.api.controller.requestentities.TransactionRequestBody;
 import com.mendel.api.entities.Transaction;
 import com.mendel.api.service.TransactionServiceInMem;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +60,21 @@ class TransactionControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().json("100.0"))
+                .andReturn();
+    }
+
+    @Test
+    void addTransactionSmokeTest() throws Exception {
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .put("/transactions/999")
+                .content("{ \"amount\":\"160\",\"type\":\"car\"}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
                 .andReturn();
     }
 

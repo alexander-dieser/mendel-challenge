@@ -1,5 +1,7 @@
 package com.mendel.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +10,8 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
+// Avoid Circular Dependencies
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Transaction {
     private long id;
     private double amount;
@@ -68,4 +72,5 @@ public class Transaction {
     public void setParent(Transaction parent) {
         this.parent = parent;
     }
+
 }

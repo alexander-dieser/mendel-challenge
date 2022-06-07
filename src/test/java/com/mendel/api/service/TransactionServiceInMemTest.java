@@ -1,5 +1,6 @@
 package com.mendel.api.service;
 
+import com.mendel.api.controller.requestentities.TransactionRequestBody;
 import com.mendel.api.entities.Transaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -34,6 +35,14 @@ class TransactionServiceInMemTest {
         ReflectionTestUtils.setField(transactionService, "transactionStore", initTransactionStoreGetTransactionSumSmokeTest());
 
         assertEquals(495, transactionService.getTransactionSum(999));
+    }
+
+    @Test
+    void addTransactionSmokeTest(){
+        TransactionServiceInMem transactionService = new TransactionServiceInMem();
+        transactionService.addTransaction(1, new TransactionRequestBody("1","car","130", null));
+
+        assertEquals(1, transactionService.getTransactionsByType("car").size());
     }
 
     private Map<Long, Transaction> initTransactionStoreGetTransactionSumSmokeTest(){
