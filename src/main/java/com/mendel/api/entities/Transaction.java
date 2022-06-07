@@ -1,19 +1,13 @@
 package com.mendel.api.entities;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class Transaction {
     private long id;
     private double amount;
@@ -35,4 +29,43 @@ public class Transaction {
         this.parent = parent;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<Transaction> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Transaction> children) {
+        this.children = children;
+    }
+
+    public Transaction getParent() {
+        return parent;
+    }
+
+    public void setParent(Transaction parent) {
+        this.parent = parent;
+    }
 }

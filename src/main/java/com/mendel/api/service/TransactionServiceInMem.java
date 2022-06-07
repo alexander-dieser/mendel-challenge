@@ -3,7 +3,6 @@ package com.mendel.api.service;
 import com.mendel.api.entities.Transaction;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +26,12 @@ public class TransactionServiceInMem implements TransactionService{
     }
 
     @Override
-    public double getTransactionSum(long transaction_id) {
-        Transaction root = transactionStore.get(transaction_id);
+    public double getTransactionSum(long transactionId) {
+
+        if(transactionStore.get(transactionId)==null)
+            return -1;
+
+        Transaction root = transactionStore.get(transactionId);
 
         double sum = root.getAmount();
         for(Transaction child : root.getChildren())
