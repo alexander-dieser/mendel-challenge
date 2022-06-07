@@ -1,21 +1,23 @@
 package com.mendel.api.service;
 
+import com.mendel.api.controller.requestentities.TransactionRequestBody;
 import com.mendel.api.entities.Transaction;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
 public class TransactionServiceInMem implements TransactionService{
+    Logger logger = Logger.getLogger(this.getClass().getName());
 
     private Map<Long, Transaction> transactionStore;
 
-    public TransactionServiceInMem(){
-        init();
+    public TransactionServiceInMem() {
+        this.transactionStore = new HashMap<>();
     }
 
     @Override
@@ -40,25 +42,21 @@ public class TransactionServiceInMem implements TransactionService{
         return sum;
     }
 
-    private void init(){
-        transactionStore = new HashMap<>();
+    @Override
+    public void addTransaction(long transactionId, TransactionRequestBody body) {
 
-        AtomicLong counter = new AtomicLong();
-        transactionStore.put(counter.get(), new Transaction(counter.getAndIncrement(), 150, "car"));
-        transactionStore.put(counter.get(), new Transaction(counter.getAndIncrement(), 250, "car"));
+        Transaction transaction = new Transaction(transactionId, Double.parseDouble(body.getAmount()), body.getType());
 
-        Transaction parent = new Transaction(999, 350, "house");
-        Transaction child1 = new Transaction(counter.getAndIncrement(), 50, "power supply", parent);
-        Transaction child11 = new Transaction(counter.getAndIncrement(), 70, "power supply 2", child1);
-        Transaction child2 = new Transaction(counter.getAndIncrement(), 25, "internet", parent);
-        child1.setChildren(List.of(child11));
-        parent.setChildren(List.of(child1, child2));
+        if(body.getParentId()!=null) {
+            Transaction parent = transactionStore.get(Long.parseLong(body.getParentId()));
+            if(parent==null)
+                logger.warning("Parent is null");
+            else {
+                transaction.setParent(parent);
+                parent.getChildren().add(transaction);
+            }
+        }
 
-        transactionStore.put(parent.getId(), parent);
-        transactionStore.put(child1.getId(), child1);
-        transactionStore.put(child11.getId(), child11);
-        transactionStore.put(child2.getId(), child2);
-
-        transactionStore.put(counter.getAndIncrement(), new Transaction(counter.getAndIncrement(), 450, "gym"));
+        transactionStore.put(transactionId, transaction);
     }
 }
