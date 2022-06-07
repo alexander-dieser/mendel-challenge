@@ -22,4 +22,9 @@ public class TransactionController {
         return transactionServiceInMem.getTransactionsByType(type);
     }
 
+    @GetMapping("sum/{transaction_id}")
+    public double getTransactionsSum(@PathVariable long transaction_id){
+        return transactionServiceInMem.getTransactionSum(transaction_id);
+    }
+
 }

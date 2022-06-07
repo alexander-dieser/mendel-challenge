@@ -46,4 +46,19 @@ class TransactionControllerTest {
                 .andReturn();
     }
 
+    @Test
+    void getTransactionsSumSmokeTest() throws Exception {
+
+        Mockito.when(transactionServiceInMem.getTransactionSum(999)).thenReturn(Double.valueOf(100));
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .get("/transactions/sum/999")
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().json("100.0"))
+                .andReturn();
+    }
+
 }
