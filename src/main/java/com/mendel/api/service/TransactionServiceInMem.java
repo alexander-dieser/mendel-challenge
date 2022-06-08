@@ -1,41 +1,62 @@
 package com.mendel.api.service;
 
+import com.mendel.api.controller.requestentities.TransactionRequestBody;
 import com.mendel.api.entities.Transaction;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
 public class TransactionServiceInMem implements TransactionService{
+    Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private List<Transaction> transactionStore;
+    private Map<Long, Transaction> transactionStore;
 
-    public TransactionServiceInMem(){
-        init();
+    public TransactionServiceInMem() {
+        this.transactionStore = new HashMap<>();
     }
 
     @Override
     public List<Transaction> getTransactionsByType(String type) {
-       return transactionStore.stream()
+       return transactionStore.values().stream()
                 .filter(t -> t.getType()!=null && t.getType().equals(type))
                 .collect(Collectors.toList());
     }
 
-    private void init(){
-        transactionStore = new ArrayList<>();
+    @Override
+    public double getTransactionSum(long transactionId) {
 
-        AtomicLong counter = new AtomicLong();
-        transactionStore.add(new Transaction(counter.getAndIncrement(), 150, "car", null));
-        transactionStore.add(new Transaction(counter.getAndIncrement(), 250, "car", null));
+        if(transactionStore.get(transactionId)==null)
+            return -1;
 
-        Transaction parent = new Transaction(counter.getAndIncrement(), 350, "house", null);
-        transactionStore.add(parent);
-        transactionStore.add(new Transaction(counter.getAndIncrement(), 50, "power supply", parent));
-        transactionStore.add(new Transaction(counter.getAndIncrement(), 25, "internet", parent));
+        Transaction root = transactionStore.get(transactionId);
 
-        transactionStore.add(new Transaction(counter.getAndIncrement(), 450, "gym", null));
+        double sum = root.getAmount();
+        for(Transaction child : root.getChildren())
+            sum += getTransactionSum(child.getId());
+
+        return sum;
+    }
+
+    @Override
+    public void addTransaction(long transactionId, TransactionRequestBody body) {
+
+        Transaction transaction = new Transaction(transactionId, Double.parseDouble(body.getAmount()), body.getType());
+
+        if(body.getParentId()!=null) {
+            Transaction parent = transactionStore.get(Long.parseLong(body.getParentId()));
+            if(parent==null)
+                logger.warning("Parent is null");
+            else {
+                transaction.setParent(parent);
+                parent.getChildren().add(transaction);
+            }
+        }
+
+        transactionStore.put(transactionId, transaction);
     }
 }
